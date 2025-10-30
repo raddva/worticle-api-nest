@@ -1,98 +1,103 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# NestJS SQL JWT REST API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Sebuah aplikasi REST API sederhana yang dibangun dengan NestJS dan TypeScript. Aplikasi ini mendemonstrasikan operasi CRUD dasar, koneksi ke database SQL (PostgreSQL), dan autentikasi API menggunakan JSON Web Tokens (JWT).
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Fitur
 
-## Description
+- **Autentikasi JWT**: Endpoint `POST /auth/register` dan `POST /auth/login` untuk mengelola pengguna dan menghasilkan token JWT.
+- **CRUD Terkait**: Operasi CRUD untuk `Users` (Pengguna) dan `Posts` (Postingan).
+- **Relasi SQL**: Relasi _database_ (One-to-Many) di mana satu `User` dapat memiliki banyak `Posts`.
+- **Endpoint Terlindungi**: Endpoint (seperti `POST /posts` dan `GET /users`) dilindungi menggunakan _JWT Guard_, hanya memperbolehkan akses bagi pengguna yang telah login.
+- **E2E Testing**: Termasuk _file_ tes E2E (`test/auth.e2e-spec.ts` dan `test/posts.e2e-spec.ts`) untuk memvalidasi alur autentikasi dan pembuatan _post_.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Instalasi dan Konfigurasi
 
-## Project setup
+1.  **Clone repositori:**
+
+    ```bash
+    git clone [URL-REPOSITORI-ANDA]
+    cd [NAMA-FOLDER-PROYEK]
+    ```
+
+2.  **Install dependensi:**
+
+    ```bash
+    npm install
+    ```
+
+3.  **Konfigurasi Lingkungan (.env)**
+    Buat _file_ `.env` di _root_ proyek. _File_ ini akan berisi kredensial database dan kunci rahasia JWT Anda.
+
+    ```env
+    # Konfigurasi Database (PostgreSQL)
+    DB_HOST=localhost
+    DB_PORT=5432
+    DB_USERNAME=postgres
+    DB_PASSWORD=password_postgres_anda
+    DB_NAME=worticle
+
+    # Kunci Rahasia JWT (ganti dengan string acak yang kuat)
+    JWT_SECRET=SANGAT_RAHASIA
+    ```
+
+4.  **Database**
+    Pastikan Anda memiliki _server_ database PostgreSQL yang berjalan dan sesuai dengan konfigurasi di `.env`.
+
+## Menjalankan Aplikasi
+
+1.  **Mode Development (dengan _hot-reload_)**
+
+    ```bash
+    npm run start:dev
+    ```
+
+    Saat server berjalan, TypeORM akan secara otomatis menyinkronkan _entity_ (`User`, `Post`) dan membuat tabel di database `worticle` Anda.
+
+2.  **Mode Produksi**
+    ```bash
+    npm run build
+    npm run start:prod
+    ```
+
+## Menjalankan Tes
+
+Proyek ini dilengkapi dengan tes E2E (End-to-End) menggunakan Jest dan Supertest untuk memvalidasi _endpoint_ API.
 
 ```bash
-$ npm install
+npm run test:e2e
 ```
 
-## Compile and run the project
+## Penjelasan Pola Arsitektur
 
-```bash
-# development
-$ npm run start
+Pola yang Digunakan: Modular Monolith
+Aplikasi ini menggunakan pola Modular Monolith, yang merupakan arsitektur standar dan yang sangat direkomendasikan oleh framework NestJS.
 
-# watch mode
-$ npm run start:dev
+Dalam pola ini, aplikasi tidak dibagi menjadi microservice yang terpisah, melainkan diatur sebagai satu aplikasi tunggal (monolith) yang dibagi menjadi modul-modul fungsional berdasarkan domain bisnis.
 
-# production mode
-$ npm run start:prod
-```
+Struktur proyek ini dibagi menjadi modul-modul utama:
 
-## Run tests
+- AuthModule: Bertanggung jawab atas registrasi, login, dan strategi JWT.
 
-```bash
-# unit tests
-$ npm run test
+- UsersModule: Bertanggung jawab atas logika bisnis dan akses data yang terkait dengan pengguna.
 
-# e2e tests
-$ npm run test:e2e
+- PostsModule: Bertanggung jawab atas logika bisnis dan akses data untuk postingan.
 
-# test coverage
-$ npm run test:cov
-```
+### Alasan Penggunaan Pola Ini
 
-## Deployment
+Pola ini dipilih karena memberikan keseimbangan terbaik antara kesederhanaan pengembangan dan skalabilitas jangka panjang untuk sebagian besar aplikasi:
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+1. Pemisahan Tanggung Jawab (Separation of Concerns) Setiap modul memiliki satu tanggung jawab yang jelas. Di dalam setiap modul, tanggung jawab dibagi lagi secara konsisten:
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+- Controller: Hanya mengurus lapisan HTTP (menerima request, memvalidasi DTO, mengembalikan response).
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+- Service: Berisi semua logika bisnis. Service tidak tahu apa-apa tentang HTTP dan dapat digunakan kembali.
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+- Entity/Repository (TypeORM): Mengurus definisi skema dan akses ke database.
 
-## Resources
+2. Kemudahan Pengujian (Testability) Pola ini sangat mudah dites. Kita dapat dengan mudah menguji logika bisnis (UsersService) secara terisolasi (sebagai unit test) atau menguji seluruh alur HTTP (auth.e2e-spec.ts) sebagai tes E2E. Pemisahan ini membuat testing menjadi jelas dan tidak rapuh.
 
-Check out a few resources that may come in handy when working with NestJS:
+3. Skalabilitas dan Pemeliharaan (Scalability & Maintainability)
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+- Awal Proyek: Pola ini cepat untuk dikembangkan karena tidak ada kerumitan komunikasi antar service.
 
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- Pertumbuhan Proyek: Jika aplikasi tumbuh sangat besar, modul-modul ini sudah "siap" untuk diekstraksi. Misalnya, jika PostsModule menjadi terlalu kompleks, modul tersebut dapat dipindahkan menjadi microservice sendiri dengan perubahan minimal pada modul Auth atau Users.
